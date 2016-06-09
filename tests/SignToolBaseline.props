@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" TreatAsLocalProperty="BuildProjectReferences" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <!-- All platforms -->
+    <SignToolBaseline Include="mscorlib.dll" />
+    <SignToolBaseline Include="mscorlib.ni.dll" />
+    <SignToolBaseline Include="System.Private.CoreLib.dll" />
+    <SignToolBaseline Include="System.Private.CoreLib.ni.dll" />
+    <SignToolBaseline Include="System.Private.CoreLib.ni.dll" />
+
+    <!-- Windows only -->
+    <SignToolBaseline Include="clrcompression.dll" />
+    <SignToolBaseline Include="libuv.dll" />
+
+    <!-- Unix only -->
+    <SignToolBaseline Include="dotnet" />
+    <SignToolBaseline Include="libclrjit.so" />
+    <SignToolBaseline Include="libcoreclr.so" />
+    <SignToolBaseline Include="libcoreclrtraceptprovider.so" />
+    <SignToolBaseline Include="libdbgshim.so" />
+    <SignToolBaseline Include="libhostfxr.so" />
+    <SignToolBaseline Include="libhostpolicy.so" />
+    <SignToolBaseline Include="libmscordaccore.so" />
+    <SignToolBaseline Include="libmscordbi.so" />
+    <SignToolBaseline Include="libsos.so" />
+    <SignToolBaseline Include="libsosplugin.so" />
+    <SignToolBaseline Include="libub.so" />
+    <SignToolBaseline Include="sosdocsunix.txt" />
+    <SignToolBaseline Include="System.Globalization.Native.so" />
+    <SignToolBaseline Include="System.IO.Compression.Native.so" />
+    <SignToolBaseline Include="System.Native.a" />
+    <SignToolBaseline Include="System.Net.Http.Native.so" />
+    <SignToolBaseline Include="System.Net.Security.Native.so" />
+    <SignToolBaseline Include="System.Security.Cryptography.Native.so" />
+    
+  </ItemGroup>
+</Project>

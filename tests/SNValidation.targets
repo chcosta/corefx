@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" TreatAsLocalProperty="BuildProjectReferences" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="SNBaseline.props" />
+  
+  <Target Name="GenerateExcludeBaselinedSNFiles"
+          Inputs="%(ManagedAssembly.Identity)"
+          Outputs="fake"
+          DependsOnTargets="SortManagedAndNativeAssemblies">
+    <PropertyGroup>
+      <BaselineFilePath>%(ManagedAssembly.Identity)</BaselineFilePath>
+      <BaselineFileName>%(ManagedAssembly.Filename)</BaselineFileName>
+    </PropertyGroup>
+    <ItemGroup>
+      <SNBaselinedExcludeManagedAssembly Include="$(BaselineFilePath)" Condition="'$(BaselineFileName)' == '%(SNBaseline.Filename)'" />
+    </ItemGroup>
+  </Target>          
+  
+  <Target Name="ExcludeBaselinedSNFiles"
+          DependsOnTargets="GenerateExcludeBaselinedSNFiles">
+    <ItemGroup>
+      <SNBaselinedManagedAssembly Include="@(ManagedAssembly)" />
+      <SNBaselinedManagedAssembly Remove="@(SNBaselinedExcludeManagedAssembly)" />
+    </ItemGroup>
+    <Message Text="Exclude: @(SNBaselinedExcludeManagedAssembly)" />
+  </Target>
+  
+  <Target Name="ValidateSN"
+          Inputs="%(SNBaselinedManagedAssembly.Identity)"
+          Outputs="fake"
+          DependsOnTargets="ExcludeBaselinedSNFiles">
+    <PropertyGroup>
+      <SNFile>%(SNBaselinedManagedAssembly.Identity)</SNFile>
+    </PropertyGroup>
+    <Exec StandardOutputImportance="Low"
+          Command="sn -vf $(SNFile)" />
+  </Target>
+</Project>

@@ -1,0 +1,11 @@
+/* QCall is a special marker for a call to CLR */
+        mscorlib is missing native assembly QCall
+
+/* System.Reflection.Metadata uses windows api's on a light up only code path, these are ignorable */
+        System.Reflection.Metadata is missing native assembly api-ms-win-core-file-l1-2-0
+        System.Reflection.Metadata is missing native assembly api-ms-win-core-file-l1-1-0
+        System.Reflection.Metadata is missing native assembly kernel32
+
+/* https://github.com/dotnet/coreclr/issues/4121 */
+        mscorlib is missing native assembly advapi32
+        mscorlib is missing native assembly mscoree

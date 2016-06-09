@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+          "Microsoft.NETCore.Windows.ApiSets": "1.0.1-*",
+          "Microsoft.NETCore.Platforms": "1.0.1-rc3-24205-02",
+          "Microsoft.NETCore.Targets": "1.0.1-rc3-24205-02",
+          "NETStandard.Library": "1.6.0-rc3-24205-02"
+  },
+  "frameworks": {
+     "netstandard1.6": {}
+  },
+  "runtimes": {
+     "rhel.7-x64": {}
+  }
+}

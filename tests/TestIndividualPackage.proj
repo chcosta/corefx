@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" TreatAsLocalProperty="BuildProjectReferences" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <UsingTask TaskName="MSBuildReplaceTextInFile" AssemblyFile="$(MSBuildThisFileDirectory)bin\MSBuildReplaceTextInFile.dll" />
+    <PropertyGroup>
+      <IsSinglePackage Condition="!$(Project.EndsWith('project.json')) AND !$(Project.Contains('\'))">true</IsSinglePackage>
+    </PropertyGroup>
+
+    <!-- This target looks through the available packages and attempts to find the latest package version
+         available in our drops.  Override this by passing "/p:Version=[version]" on the command-line -->
+    <Target Name="DetermineLatestVersion"
+            Condition="'$(IsSinglePackage)' == 'true' AND '$(Version)' == ''"
+            BeforeTargets="GenerateSinglePackageProjectJson">
+      <ItemGroup>
+        <!-- Grab all assemblies which are close to the package name we are looking for -->
+        <PossibleAssemblies Include="$(X86Packages)\$(Project).*" />
+        <PossibleAssemblies Include="$(Amd64Packages)\$(Project).*" />
+        <PossibleAssemblies Include="$(ArmPackages)\$(Project).*" />
+        <!-- Use the PossibleAssemblies to regex match assemblies we are looking for. -->
+        <ValidAssemblies Include="$([System.Text.RegularExpressions.Regex]::Match('%(PossibleAssemblies.Identity)', '\\$(Project)\.\d\.\d\.\d-[^-]+-'))" />
+      </ItemGroup>
+  
+      <!-- Get package versions from valid assemblies -->
+      <ItemGroup>
+        <PackageVersions Include="$([System.Text.RegularExpressions.Regex]::Match('%(ValidAssemblies.Identity)', '(\d\.\d\.\d-[^-]+-)'))" />
+      </ItemGroup>
+      <RemoveDuplicates Inputs="@(PackageVersions)">
+        <Output
+          TaskParameter="Filtered"
+          ItemName="UniquePackageVersions"/>
+      </RemoveDuplicates>
+      <!-- Set package version to newest -->
+      <PropertyGroup>
+        <PackageVersion>%(UniquePackageVersions.Identity)*</PackageVersion>
+      </PropertyGroup>
+    </Target>
+
+    <!-- Grabs a generic project.json template and tailors it for the package we want to validate -->
+    <Target Name="GenerateSinglePackageProjectJson"
+            Condition="'$(IsSinglePackage)' == 'true'"
+            BeforeTargets="DefineDynamicProperties">
+      <PropertyGroup>
+        <SinglePackageDestFolder>$(TestBinFolder)SinglePackageSource\SinglePackage.$(Project)\</SinglePackageDestFolder>
+        <SinglePackageSourceProjectJson>$(MSBuildThisFileDirectory)Projects\SinglePackageTemplate\_project.json</SinglePackageSourceProjectJson>
+        <SinglePackageDestProjectJson>$(SinglePackageDestFolder)project.json</SinglePackageDestProjectJson>
+        
+        <PackageVersion Condition="'$(Version)' != ''">$(Version)</PackageVersion>
+      </PropertyGroup>
+      <!-- Copy the generic project.json template into the single package destination folder -->
+      <Copy SourceFiles="$(SinglePackageSourceProjectJson)" DestinationFiles="$(SinglePackageDestProjectJson)"/>
+      <!-- Update generic project.json with run specific properties -->
+      <MSBuildReplaceTextInFile
+          File="$(SinglePackageDestProjectJson)"
+          Find="[Package]"
+          Replace="$(Project)" />
+      <MSBuildReplaceTextInFile
+          File="$(SinglePackageDestProjectJson)"
+          Find="[Version]"
+          Replace="$(PackageVersion)" />
+
+      <!-- Update the project property to reference the single Package project.json we created -->
+      <PropertyGroup>
+        <Project>$(SinglePackageDestFolder)project.json</Project>
+      </PropertyGroup>
+    </Target>
+</Project>

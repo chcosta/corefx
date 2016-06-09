@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" TreatAsLocalProperty="BuildProjectReferences" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="SNValidation.targets" />
+  <Import Project="SignToolValidation.targets" />
+  
+  <Target Name="SigningValidateAll"
+          DependsOnTargets="ValidateSN;ValidateSignTool" />
+          
+  <Target Name="GetAssemblyList" 
+          Inputs="%(TestTargetDirectories.Identity)" 
+          Outputs="fake">
+    <ItemGroup>
+      <AssemblyList Include="%(TestTargetDirectories.Identity)\*" />
+    </ItemGroup>
+  </Target>
+  
+  <Target Name="SortManagedAndNativeAssemblies"
+          Inputs="%(AssemblyList.Identity)"
+          Outputs="fake"
+          DependsOnTargets="GetAssemblyList">
+    <PropertyGroup>
+      <AssemblyFile>%(AssemblyList.Identity)</AssemblyFile>
+    </PropertyGroup>
+    <Exec 
+          Command="corflags $(AssemblyFile)"
+          IgnoreExitCode="true"
+          IgnoreStandardErrorWarningFormat="true" 
+          StandardOutputImportance="Low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
+      <Output TaskParameter="ExitCode" PropertyName="CorFlagsExitCode" />
+    </Exec>
+    <ItemGroup>
+      <ManagedAssembly Condition="'$(CorFlagsExitCode)' == '0'" Include="$(AssemblyFile)" />
+      <NativeAssembly Condition="'$(CorFlagsExitCode)' != '0'" Include="$(AssemblyFile)" />
+    </ItemGroup>
+  </Target>
+  
+  <Target Name="PrintLists">
+    <Message Text="Managed Assemblies: @(ManagedAssembly)" />
+    <Message Text="Native Assemblies: @(NativeAssembly)" />
+  </Target>
+</Project>

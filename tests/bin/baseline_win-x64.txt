@@ -1,0 +1,9 @@
+/* System.Reflection.Metadata uses windows api's on a light up only code path, these are ignorable */
+        System.Reflection.Metadata is missing native assembly api-ms-win-core-file-l1-2-0
+        System.Reflection.Metadata is missing native assembly api-ms-win-core-file-l1-1-0
+        System.Reflection.Metadata is missing native assembly kernel32
+
+/* Windows API Sets */
+        System.Globalization.Extensions is missing native assembly api-ms-win-core-errorhandling-l1-1-0
+        System.Globalization.Extensions is missing native assembly api-ms-win-core-localization-l1-2-0
+        System.Globalization.Extensions is missing native assembly api-ms-win-core-normalization-l1-1-0

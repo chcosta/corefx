@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.0.1-*",
+          "[Package]": "[Version]"
+  },
+  "frameworks": {
+    "dnxcore50": {}
+  },
+  "runtimes": {
+    "win7-x86": {},
+    "win7-x64": {},
+  }
+}

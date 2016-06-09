@@ -1,0 +1,6 @@
+/* UWP missing assemblies, requires Microsoft.NETCore.Portable.Compatibility and direct references */
+        mscorlib is missing System.Console, 4.0.0.0
+        System is missing System.ComponentModel.TypeConverter, 4.0.1.0
+        System is missing System.ComponentModel.Primitives, 4.0.1.0
+        System.Xml is missing System.Xml.XPath, 4.0.1.0
+        System.Xml.Linq is missing System.Xml.XPath.XDocument, 4.0.1.0

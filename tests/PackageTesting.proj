@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" TreatAsLocalProperty="BuildProjectReferences" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <!-- Define values like PackagesDir, ToolsDir -->
+    <Import Project="$(MSBuildThisFileDirectory)..\dir.props" />
+    <!-- Usage message -->
+    <PropertyGroup>
+      <Usage>Given a project (a path to a project.json) file do the following:
+    
+    1) Restore packages for the project
+    2) Determine the targets for the project (tfm/rid)
+    3) Get the package assets for each target (tfm/rid) of the project and copy them to a directory
+    4) Validate no binclash occurs from the asset copy (3)
+    5) Verify the closure of the packages 
+    
+Usage: 
+    msbuild PackageTesting.proj /p:Project=(Packaging Project Path)\project.json 
+                                [/p:UseCpvsBuild=true] 
+                                [/p:UseDnx=true]
+    : Use this command-line to restore a project.json and perform package validation.
+    - or -
+    msbuild PackageTesting.proj /p:Project=(Package Name) 
+                                [/p:Version=(package version)] 
+                                [/p:UseCpvsBuild=true] 
+                                [/p:UseDnx=true]
+    : Use this command-line to restore the latest version of a individual package and 
+    perform package validation.
+
+Options:
+    UseCpvsBuild=true (Default:false) 
+    : Use packages from \\cpvsbuild\drops\dev14\projectk\raw\current
+    UseDnx=true (Default:false) 
+    : Use Dnx for package restore instead of NuGet</Usage>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <FxCoreToolsPath>$(MSBuildThisFileDirectory)..\tools\</FxCoreToolsPath>
+    </PropertyGroup>
+
+    <UsingTask TaskName="PrereleaseResolveNuGetPackageAssets" AssemblyFile="$(BuildToolsTaskDir)Microsoft.DotNet.Build.Tasks.dll"/>
+    <UsingTask TaskName="GetRuntimeTargets" AssemblyFile="$(BuildToolsTaskDir)Microsoft.DotNet.Build.Tasks.Packaging.dll" />
+    <UsingTask TaskName="GetRuntimeJsonValues" AssemblyFile="$(BuildToolsTaskDir)Microsoft.DotNet.Build.Tasks.Packaging.dll" />
+
+    <Import Project="SigningValidation.targets" />
+    <!-- Target flow -->
+    <Target Name="Build"
+        DependsOnTargets="CheckProperties;DefineDynamicProperties;_RestoreNuGet;RestoreProject;RunTests" />
+    
+    <Target Name="RunTests"
+        DependsOnTargets="GetRuntimeJsonTargets;IncludePlatformsRuntimes;RunPackagingTests;SigningValidateAll" />
+    
+    <!-- Global Properties -->
+    <PropertyGroup>
+        <TestBinFolder>$(TestWorkingDir)</TestBinFolder>
+        <!-- Overwrite nugettoolpath so we use our version from RestoreTools.targets -->
+        <NuGetCachedPath>$(TestBinFolder)\Tools\.nuget\3.4\nuget.exe</NuGetCachedPath>
+        <NuGetToolPath>$(TestBinFolder)nuget\NuGet.exe</NuGetToolPath>
+        <Language>ENU</Language>
+    </PropertyGroup>
+
+    <!-- Importing this project allows us to attempt to validate a single library based on library name rather
+         than using any of the meta-packages -->
+    <Import Project="TestIndividualPackage.proj" />
+
+    <!-- Check inputs and display usage if invalid -->
+    <Target Name="CheckProperties">
+        <PropertyGroup>
+            <InvalidUsage Condition="'$(Project)' == ''">true</InvalidUsage>
+        </PropertyGroup>
+        <Message Condition="'$(InvalidUsage)' == 'true'"
+                 Text="'$(Usage)'" />
+        <Error Condition="'$(InvalidUsage)' == 'true'"
+               Text="Invalid usage." />
+    </Target>
+    
+    <!-- Generate Project list, or use what is passed through the "Project" property -->
+    <Target Name="DefineDynamicProperties"
+      Inputs="$(Project)"
+      Outputs="fake">
+
+        <!-- Set our project to the "Project" property if specified on the command line and make sure it's rooted -->
+        <PropertyGroup Condition="'$([System.IO.Path]::IsPathRooted($(Project)))' != 'true' ">
+            <Project>$(MSBuildThisFileDirectory)$(Project)</Project>
+        </PropertyGroup>
+        
+        <Error 
+            Condition="!$(Project.EndsWith('project.json')) AND '$(IsSinglePackage)' != 'true'"
+            Text="Please specify a project.json file for testing." />
+        <PropertyGroup>
+            <!-- Create a unique test directory -->
+            <_TestDirectory>$([System.IO.Path]::GetDirectoryName('$(Project)'))</_TestDirectory>
+            <_TestDirectory Condition="$(_TestDirectory.EndsWith('/\'.ToCharArray()))">$(_TestDirectory.TrimEnd('/\'.ToCharArray()))</_TestDirectory>
+            <!-- The Open libraries are in an 'src' directory, which isn't very useful, get parent directory which is the library name -->
+            <_TestDirectory Condition="$(_TestDirectory.EndsWith('\src'))">$([System.IO.Directory]::GetParent($(_TestDirectory)))</_TestDirectory>
+            <_SubStringIndex>$(_TestDirectory.LastIndexOf('\'))</_SubStringIndex>
+            <_TestDirectory>$(TestBinFolder)$(_TestDirectory.SubString($(_SubStringIndex)))</_TestDirectory>
+        </PropertyGroup>
+
+        <PropertyGroup>        
+            <ProjectDirectoryName>$([System.IO.Path]::GetDirectoryName('$(Project)'))\</ProjectDirectoryName>
+            <!-- Associate the test directory with the project -->
+            <TestDirectoryName>$(_TestDirectory)\</TestDirectoryName>
+        </PropertyGroup>
+    </Target>
+
+    <PropertyGroup>
+        <NuGetPackageSource>@(NuGetSourceList -> '-source %(Identity)', ' ')</NuGetPackageSource>
+        <NuGetConfigCommandLine>$(NuGetPackageSource)</NuGetConfigCommandLine>
+    
+        <RootNugetRestoreCommand>"$(NuGetToolPath)" restore</RootNugetRestoreCommand>
+        <NuGetArguments>$(NuGetArguments) -Source "https:%2F%2Fwww.nuget.org/api/v2"</NuGetArguments> 
+        <NuGetArguments>$(NuGetArguments) -Source "https:%2F%2Fwww.myget.org/F/dotnet-buildtools"</NuGetArguments> 
+        <NuGetArguments>$(NuGetArguments) -Source "https:%2F%2Fdotnet.myget.org/F/dotnet-core/api/v3/index.json"</NuGetArguments>
+        <NuGetArguments>$(NuGetArguments) -Verbosity detailed</NuGetArguments>
+        
+        <VerifyClosureCommand>$(MSBuildThisFileDirectory)bin\VerifyClosure.bat</VerifyClosureCommand>
+    </PropertyGroup>
+
+    <!-- restore nuget and dnu -->
+    <Import Project="RestoreTools.targets" /> 
+    
+    <Target Name="GetRuntimeJsonTargets">
+        <GetRuntimeTargets JsonFilename="$(ProjectDirectoryName)project.lock.json">
+            <Output TaskParameter="TargetItems"
+                ItemName="PackagingTargetItems" />
+        </GetRuntimeTargets>
+        <Message Text="Packaging Targets: @(PackagingTargetItems)" />
+        <PropertyGroup>
+            <PackagingTargetItemsProperty>@(PackagingTargetItems)</PackagingTargetItemsProperty>
+            <UsePlatformsRuntimes Condition="!$(PackagingTargetItemsProperty.Contains('/'))">true</UsePlatformsRuntimes>
+        </PropertyGroup>
+        <Message Text="UsePlatformsRuntimes: $(UsePlatformsRuntimes)" />
+    </Target>
+
+    <Target Name="RestoreProject">
+        <Message Text="Project: $(Project)" />
+        <RemoveDir Directories="$(TestDirectoryName)" />
+        <MakeDir Directories="$(TestDirectoryName)\packages" />
+        
+        <!-- Allow switch between restoring with NuGet and restoring with dnu -->
+        <PropertyGroup>
+            <NugetRestoreCommand>$(RootNugetRestoreCommand) $(Project) $(NuGetArguments) -PackagesDirectory "$(TestDirectoryName)\packages"</NugetRestoreCommand>
+            <RestoreCommand>$(NugetRestoreCommand)</RestoreCommand>
+        </PropertyGroup>
+        
+        <Exec Command="$(RestoreCommand)" 
+            ConsoleToMSBuild="true" >
+            <Output TaskParameter="ConsoleOutput" PropertyName="RestoreOutput" />
+        </Exec>
+        
+        <!-- Check for restore errors -->
+        <Error 
+            Condition="$(RestoreOutput.Contains('Some packages are not compatible'))"
+            Text="Some packages are not compatible." />
+        <Error
+            Condition="$(RestoreOutput.Contains('Unable to resolve'))"
+            Text="Unable to resolve package." /> 
+        <Error 
+            Condition="$(RestoreOutput.Contains('Errors in'))"
+            Text="Error restoring '$(Project)'" 
+            ContinueOnError="true"/>
+    </Target>
+
+    <Target Name="IncludePlatformsRuntimes"
+        Inputs="%(PackagingTargetItems.Identity)"
+        Outputs="fake"
+        Condition="'$(UsePlatformsRuntimes)' == 'true'"
+        >
+        
+        <PropertyGroup>
+            <PackagingTargetItem>%(PackagingTargetItems.Identity)</PackagingTargetItem>
+            <PlatformsRuntimePath>$(MSBuildThisFileDirectory)..\Open\pkg\Microsoft.NETCore.Platforms\runtime.json</PlatformsRuntimePath>
+        </PropertyGroup>
+        <Message Text="IncludePlatformsRuntimes: %(PackagingTargetRuntimes.Identity)" />
+        <GetRuntimeJsonValues
+            JsonFilename="$(PlatformsRuntimePath)">
+            <Output TaskParameter="JsonItems"
+                ItemName="PlatformsRuntimeItems" />
+        </GetRuntimeJsonValues>
+        <Message Text="PlatformsRuntimeItems: @(PlatformsRuntimeItems)" />
+        <!-- Add each of the rid's to our tfm's -->
+        <ItemGroup>
+            <PackagingTargetItems Include="$(PackagingTargetItem)/%(PlatFormsRuntimeItems.Identity)" />
+        </ItemGroup>
+    </Target>
+    <!-- Run packaging tests based on previously restored packaging directory (RestoreProject target) -->
+    <Target Name="RunPackagingTests"
+      Inputs="%(PackagingTargetItems.Identity)"
+      Outputs="fake"
+      >
+        <ItemGroup>
+          <NETNativePrivates Include="System.Private.CompatQuirks" />
+          <NETNativePrivates Include="System.Private.CompilerServices.ICastable" />
+          <NETNativePrivates Include="System.Private.CoreLib.Augments" />
+          <NETNativePrivates Include="System.Private.CoreLib.CompilerServices" />
+          <NETNativePrivates Include="System.Private.CoreLib.DeveloperExperience" />
+          <NETNativePrivates Include="System.Private.CoreLib" />
+          <NETNativePrivates Include="System.Private.CoreLib.DynamicDelegate" />
+          <NETNativePrivates Include="System.Private.CoreLib.InteropServices" />
+          <NETNativePrivates Include="System.Private.CoreLib.Reflection" />
+          <NETNativePrivates Include="System.Private.CoreLib.Threading" />
+          <NETNativePrivates Include="System.Private.CoreLib.WinRTInterop" />
+          <NETNativePrivates Include="System.Private.DeveloperExperience.AppX" />
+          <NETNativePrivates Include="System.Private.DeveloperExperience.Console" />
+          <NETNativePrivates Include="System.Private.DispatchProxy" />
+          <NETNativePrivates Include="System.Private.ILToolchain" />
+          <NETNativePrivates Include="System.Private.Interop" />
+          <NETNativePrivates Include="System.Private.Interop.Extensions" />
+          <NETNativePrivates Include="System.Private.MCG" />
+          <NETNativePrivates Include="System.Private.PortableServiceModelThunks" />
+          <NETNativePrivates Include="System.Private.PortableThunks" />
+          <NETNativePrivates Include="System.Private.Reflection.Augments" />
+          <NETNativePrivates Include="System.Private.Reflection.Core" />
+          <NETNativePrivates Include="System.Private.Reflection" />
+          <NETNativePrivates Include="System.Private.Reflection.Execution" />
+          <NETNativePrivates Include="System.Private.Reflection.Extensibility" />
+          <NETNativePrivates Include="System.Private.Reflection.Metadata" />
+          <NETNativePrivates Include="System.Private.Reflection.MissingMetadataException" />
+          <NETNativePrivates Include="System.Private.StackTraceGenerator" />
+          <NETNativePrivates Include="System.Private.Threading.AsyncCausalitySupport" />
+          <NETNativePrivates Include="System.Private.Threading" />
+          <NETNativePrivates Include="System.Private.TypeLoader" />
+          <NETNativePrivates Include="System.Private.WinRTInterop.CoreLib" />
+        </ItemGroup>
+      
+        <PropertyGroup>
+            <ProjectLockJsonDirectoryName>$(ProjectDirectoryName)</ProjectLockJsonDirectoryName>
+            <ProjectLockJson>$(ProjectLockJsonDirectoryName)project.lock.json</ProjectLockJson>
+            
+            <!-- TargetMonikers may be of the form 'tfm' or 'tfm/rid' -->
+            <OriginalTargetMoniker>%(PackagingTargetItems.Identity)</OriginalTargetMoniker>
+            
+            <!-- Index for separating tfm and rid -->
+            <SplitIndex>$(OriginalTargetMoniker.IndexOf('/'))</SplitIndex>
+            
+            <!-- Get rid and trim the leading '/' -->
+            <RuntimeIdentifier Condition="'$(SplitIndex)' != '-1'">$(OriginalTargetMoniker.SubString($(SplitIndex)))</RuntimeIdentifier>
+            <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier.SubString(1))</RuntimeIdentifier>
+            <RuntimeIdentifierDirectory>$(RuntimeIdentifier)</RuntimeIdentifierDirectory>
+            <RuntimeIdentifierDirectory Condition="'$(RuntimeIdentifier)' == ''">_</RuntimeIdentifierDirectory>
+            <!-- Get the tfm -->
+            <TargetMoniker Condition="'$(SplitIndex)' == '-1'">$(OriginalTargetMoniker)</TargetMoniker>
+            <TargetMoniker Condition="'$(SplitIndex)' != '-1'">$(OriginalTargetMoniker.SubString(0, $(SplitIndex)))</TargetMoniker>
+            <VerifyClosureCommand>$(VerifyClosureCommand) /baselinefile=$(MSBuildThisFileDirectory)bin\baseline_$(RuntimeIdentifier).txt</VerifyClosureCommand>
+            
+            <CheckGac Condition="'$(CheckGac)' == '' and $(TargetMoniker.Contains('.NETFramework'))">true</CheckGac>
+            <VerifyClosureCommand Condition="'$(CheckGac)' == 'true'">$(VerifyClosureCommand) /checkgac</VerifyClosureCommand>
+
+            <!-- The Windows API sets are inbox for UAP, don't do pinvoke checks for this target platform. -->
+            <VerifyClosureCommand Condition="$(OriginalTargetMoniker.Contains('UAP,Version=v10.0/win10'))">$(VerifyClosureCommand) /nocheckpinvokes</VerifyClosureCommand>
+            <VerifyClosureCommand Condition="$(OriginalTargetMoniker.Contains('UAP,Version=v10.0/win10'))">$(VerifyClosureCommand) /ignore=Windows,255.255.255.255</VerifyClosureCommand>
+            <VerifyClosureCommand Condition="$(OriginalTargetMoniker.Contains('-aot'))">$(VerifyClosureCommand) /ignore=@(NETNativePrivates)</VerifyClosureCommand>
+        </PropertyGroup>
+        <Message Text="Test Directory: $(TestDirectoryName)" />
+        <Message Text="ProjectLockJson: $(ProjectLockJson)" />   
+        <Message Text="OriginalTargetMoniker: $(OriginalTargetMoniker)" />   
+        <Message Text="TargetMoniker: $(TargetMoniker)" />
+        <Message Text="RuntimeIdentifier: $(RuntimeIdentifier)" />
+        <PrereleaseResolveNuGetPackageAssets Condition="Exists('$(ProjectLockJson)')"
+                               AllowFallbackOnTargetSelection="true"
+                               IncludeFrameworkReferences="false"
+                               NuGetPackagesDirectory="$(TestDirectoryName)\packages"
+                               RuntimeIdentifier="$(RuntimeIdentifier)"
+                               ProjectLanguage="$(Language)"
+                               ProjectLockFile="$(ProjectLockJson)"
+                               TargetMonikers="$(TargetMoniker)">
+            <Output TaskParameter="ResolvedAnalyzers" ItemName="Analyzer" />
+            <Output TaskParameter="ResolvedReferences" ItemName="Reference" />
+            <Output TaskParameter="ResolvedCopyLocalItems" ItemName="None" />
+        </PrereleaseResolveNuGetPackageAssets>
+
+        <Message Text="ResolvedAnalyzers: @(Analyzer)" Importance="Low" />
+        <Message Text="ResolvedReferences: @(Reference)" Importance="Low"/>
+        <Message Text="ResolvedCopyLocalItems: @(None)" Importance="Low"/>
+
+        <PropertyGroup>
+            <TestTargetDirectory>$(TestDirectoryName)\$(TargetMoniker)_$(RuntimeIdentifierDirectory)</TestTargetDirectory>
+        </PropertyGroup>
+        <ItemGroup>
+          <TestTargetDirectories Include="$(TestTargetDirectory)" />
+        </ItemGroup>
+        <!-- Create rid directory -->
+        <MakeDir Directories="$(TestTargetDirectory)" />
+        
+        <!-- Copy project.json and project.lock.json into TestDirectoryName just for ease of accessibility -->
+        <Copy 
+            SourceFiles="$(Project);$(ProjectLockJson)"
+            DestinationFolder="$(TestDirectoryName)" />
+        
+        <Copy Condition="'$(UsePlatformsRuntimes)' == 'true'"
+            SourceFiles="$(PlatformsRuntimePath)"
+            DestinationFolder="$(TestDirectoryName)" />
+        <!-- Copy package assets into TestTargetDirectory -->
+        <Copy
+            SourceFiles="@(None)"
+            DestinationFolder="$(TestTargetDirectory)" />
+        <ItemGroup>
+            <CopiedFiles Include="$(TestTargetDirectory)\**" />
+        </ItemGroup>
+        <!-- Check for binclash -->
+        <PropertyGroup>
+          <BinClashError Condition="'@(None->Count())' != '@(CopiedFiles->Count())'">true</BinClashError>
+        </PropertyGroup>
+        <Message Text="Resolved copy local items:" Condition="'$(BinClashError)' == 'true'" Importance="High" />
+        <Message Text="- %(None.Identity)" Condition="'$(BinClashError)' == 'true'" Importance="High" />
+        <Message Text="Binplaced items:" Condition="'$(BinClashError)' == 'true'" Importance="High" />
+        <Message Text="- %(CopiedFiles.Identity)" Condition="'$(BinClashError)' == 'true'" Importance="High" />
+        <Error 
+            Condition="'$(BinClashError)' == 'true'" 
+            Text="The total number of resolved copy local items ('@(None->Count())') does not equal the total number of binplaced files ('@(CopiedFiles->Count())').  This can indicate a binclash." />
+        
+        <!-- Verify closure of package assets -->
+        <Exec 
+            Command="$(VerifyClosureCommand) $(TestTargetDirectory)" 
+            ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="VerifyClosureOutput" />
+        </Exec>
+        <Error 
+            Condition="'$(VerifyClosureOutput)' != ''"
+            Text="Closure is not complete." />
+    </Target>
+
+</Project>

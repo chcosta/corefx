@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" TreatAsLocalProperty="BuildProjectReferences" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="SignToolBaseline.props" />
+  
+  <Target Name="GenerateExcludeBaselinedSignToolFiles"
+          Inputs="%(AssemblyList.Identity)"
+          Outputs="fake"
+          DependsOnTargets="SortManagedAndNativeAssemblies">
+    <PropertyGroup>
+      <BaselineFilePath>%(AssemblyList.Identity)</BaselineFilePath>
+      <BaselineFileName>%(AssemblyList.Filename)</BaselineFileName>
+    </PropertyGroup>
+    <ItemGroup>
+      <SignToolBaselinedExcludeAssembly Include="$(BaselineFilePath)" Condition="'$(BaselineFileName)' == '%(SignToolBaseline.Filename)'" />
+    </ItemGroup>
+  </Target>          
+  
+  <Target Name="ExcludeBaselinedSignToolFiles"
+          DependsOnTargets="GenerateExcludeBaselinedSignToolFiles">
+    <ItemGroup>
+      <SignToolBaselinedAssembly Include="@(AssemblyList)" />
+      <SignToolBaselinedAssembly Remove="@(SignToolBaselinedExcludeAssembly)" />
+    </ItemGroup>
+    <Message Text="Exclude: @(SignToolBaselinedExcludeAssembly)" />
+  </Target>
+  
+  <Target Name="ValidateSignTool"
+          Inputs="%(SignToolBaselinedAssembly.Identity)"
+          Outputs="fake"
+          DependsOnTargets="ExcludeBaselinedSignToolFiles">
+    <PropertyGroup>
+      <SignToolFile>%(SignToolBaselinedAssembly.Identity)</SignToolFile>
+    </PropertyGroup>
+    <Exec StandardOutputImportance="Low"
+          Command="signtool verify /pa $(SignToolFile)" />
+  </Target>
+</Project>

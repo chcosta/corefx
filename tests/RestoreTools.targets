@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Target Name="_RestoreNuGet"
+    Inputs="$(NuGetCachedPath)"
+    Outputs="$(NuGetToolPath)">
+    <Message Importance="High" Text="Restoring NuGet..." />
+    <Message Text="NuGetCachedPath: $(NuGetCachedPath)" />
+    <Message Text="NuGetToolPath: $(NuGetToolPath)" />
+    <!-- Download latest nuget.exe -->
+    <Copy SourceFiles="$(NuGetCachedPath)"
+      DestinationFiles="$(NuGetToolPath)"
+      SkipUnchangedFiles="true"
+      />
+  </Target>
+
+  <!-- restore build tools for dnx -->
+  <Target Name="_RestoreBuildTools">
+    <PropertyGroup>
+      <NugetRestoreCommand>$(RootNugetRestoreCommand) $(NuGetArguments) -PackagesDirectory "$(PackagesDir.TrimEnd('\'))"</NugetRestoreCommand>
+      <_RestoreBuildToolsCommand>$(NugetRestoreCommand) "$(SourceDir).nuget/packages.$(OsEnvironment).config"</_RestoreBuildToolsCommand>
+    </PropertyGroup>
+
+    <!-- Restore build tools -->
+    <Exec Command="$(_RestoreBuildToolsCommand)" StandardOutputImportance="Low" />
+
+    <!-- Add DNU and Roslyn tool execute rights -->
+    <Exec Condition="'$(OsEnvironment)'=='Unix'"
+          Command="chmod a+x &quot;$(DnxPackageDir)/bin/dnu&quot;" />
+    <Exec Condition="'$(OsEnvironment)'=='Unix'"
+          Command="chmod a+x &quot;$(DnxPackageDir)/bin/dnx&quot;" />
+    <Exec Condition="'$(OsEnvironment)'=='Unix'"
+          Command="find '$(RoslynPackageDir)tools' -name &quot;*.exe&quot; -exec chmod &quot;+x&quot; '{}' ';'" />
+    <Message Text="DnuToolPath: $(DnuToolPath)" />
+  </Target>
+</Project>

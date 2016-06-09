@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+          "Microsoft.NETCore": "5.0.1-*",
+          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2-*",
+  },
+  "frameworks": {
+    "dnxcore50": {}
+  },
+  "runtimes": {
+    "osx.10.10-x64": {}
+  }
+}

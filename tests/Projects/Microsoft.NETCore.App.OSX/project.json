@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.0.1-*",
+          "Microsoft.NETCore.Targets": "1.0.1-*",
+          "Microsoft.NETCore.App": "1.0.0-*",
+          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2-*",
+          "System.AppContext": "4.1.0-*",
+          "System.Security.Cryptography.Algorithms": "4.2.0-*",
+          "System.Security.Cryptography.X509Certificates": "4.1.0-*"
+  },
+  "frameworks": {
+     "netcoreapp1.0": {}
+  },
+  "runtimes": {
+     "osx.10.10-x64": {},
+     "osx.10.11-x64": {}
+  }
+}
