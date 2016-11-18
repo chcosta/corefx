@@ -336,5 +336,5 @@
   <Target Name="GenerateTestProjectJson" />
 
   <Import Condition="'$(_BuildAgainstPackages)' == 'true'" Project="$(ToolsDir)/buildagainstpackages.targets" />
-
+  <Import Condition="'$(_BuildVertical)' == 'true'" Project="buildvertical.traversal.targets" />
 </Project>

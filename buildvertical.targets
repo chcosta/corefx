@@ -4,8 +4,9 @@
 
   <PropertyGroup>
     <BinDir>$(BinDir)$(VerticalGroup)/</BinDir>
+    <_ImportedBuildVerticalTargets>true</_ImportedBuildVerticalTargets>
   </PropertyGroup>
-  
+
   <!-- Gather the projects used for building a vertical (all the src\proj files ) -->
   <Target Name="GatherProjectsForVerticalBuild"
           BeforeTargets="DetermineBuildVerticalProjects">
@@ -26,21 +27,6 @@
       <Project Remove="%(VerticalProjects.Identity)" Condition="'%(VerticalProjects.OmitReason)' != ''" />
     </ItemGroup>
     <Message Text="Omitting Project %(VerticalProjects.Identity) because '%(VerticalProjects.OmitReason)'" Condition="'%(VerticalProjects.OmitReason)' != ''"/>
-  </Target>
-
-  <!-- Override buildallprojects from dir.traversal.targets -->
-  <Target Name="BuildAllProjects">
-    <PropertyGroup>
-      <DefaultBuildAllTarget Condition="'$(DefaultBuildAllTarget)'==''">$(MSBuildProjectDefaultTargets)</DefaultBuildAllTarget>
-    </PropertyGroup>
-    <Message Importance="Low" Text="Building: %(Project.Identity) for %(Project.TargetGroup), %(Project.OSGroup)" />
-    <MSBuild Targets="$(DefaultBuildAllTarget)"
-             Projects="@(Project)"
-             Condition="'%(Identity)' != ''"
-             Properties="DefaultBuildAllTarget=$(DefaultBuildAllTarget);BuildAllProjects=true;TargetGroup=%(Project.TargetGroup);OSGroup=%(Project.OSGroup)" 
-             ContinueOnError="ErrorAndContinue" />
-    <!-- Given we ErrorAndContinue we need to propagate the error if the overall task failed -->
-    <Error Condition="'$(MSBuildLastTaskResult)'=='false'" />
   </Target>
 
   <!-- The initial shaking target for trimming down applicable projects for specified vertical -->
