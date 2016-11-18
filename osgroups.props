@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+      <OSGroups Include="Windows">
+        <OSGroup>Windows_NT</OSGroup>
+        <FallbackGroup>AnyOS</FallbackGroup>
+    </OSGroups>
+    <OSGroups Include="Windows_NT">
+        <OSGroup>Windows_NT</OSGroup>
+        <FallbackGroup>Windows</FallbackGroup>
+    </OSGroups>
+    <OSGroups Include="Unix">
+        <OSGroup>Unix</OSGroup>
+        <FallbackGroup>AnyOS</FallbackGroup>
+    </OSGroups>
+    <OSGroups Include="Linux">
+        <OSGroup>Linux</OSGroup>
+        <FallbackGroup>Unix</FallbackGroup>
+    </OSGroups>
+    <OSGroups Include="OSX">
+        <OSGroup>OSX</OSGroup>
+        <FallbackGroup>Unix</FallbackGroup>
+    </OSGroups>
+    <OSGroups Include="AnyOS">
+      <OSGroup>AnyOS</OSGroup>
+    </OSGroups>
+  </ItemGroup>
+</Project>

@@ -8,6 +8,10 @@
     <UseOpenKey Condition="'$(UseOpenKey)'==''">true</UseOpenKey>
     <IsPartialFacadeAssembly Condition="'$(TargetGroup)' == ''">true</IsPartialFacadeAssembly>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETCoreApp,Version=v1.1</NuGetTargetMoniker>
+    <SupportedGroups>
+      netcoreapp1.1_AnyOS
+    </SupportedGroups>
+    <DefaultTargetGroup>netcoreapp1.1</DefaultTargetGroup>   
   </PropertyGroup>
   <!-- Default configurations to help VS understand the options -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'" />

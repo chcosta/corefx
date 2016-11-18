@@ -6,6 +6,7 @@
     <OutputType>Library</OutputType>
     <NuGetTargetMoniker>.NETStandard,Version=v1.7</NuGetTargetMoniker>
     <PackageTargetFramework>netstandard1.7;uap10.1</PackageTargetFramework>
+    <SupportedTargetGroups>netstandard1.7</SupportedTargetGroups>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Runtime.Handles.Forwards.cs" />

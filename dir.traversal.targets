@@ -112,7 +112,11 @@
     <Message Text="%(PackageIds.Identity)" Importance="High" />
   </Target>
 
+
+
+
   <Target Name="BuildAllProjects" DependsOnTargets="FilterProjects">
+    <Error Condition="'$(VerticalGroup)' != ''" Text="This project should be overridden with the BuildAllProjects target from buildvertical.targets if VerticalGroup is specified." />
     <PropertyGroup>
       <DefaultBuildAllTarget Condition="'$(DefaultBuildAllTarget)'==''">$(MSBuildProjectDefaultTargets)</DefaultBuildAllTarget>
     </PropertyGroup>
@@ -330,5 +334,7 @@
 
   <!-- Target will be overridden if buildagainstpackages.targets is imported. -->
   <Target Name="GenerateTestProjectJson" />
+
   <Import Condition="'$(_BuildAgainstPackages)' == 'true'" Project="$(ToolsDir)/buildagainstpackages.targets" />
+
 </Project>

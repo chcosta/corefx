@@ -16,6 +16,14 @@
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.0</NuGetTargetMoniker>
     <PackageTargetFramework Condition="'$(TargetGroup)'==''">netstandard1.0;uap10.1</PackageTargetFramework>
   </PropertyGroup>
+  <PropertyGroup>
+    <SupportedGroups>
+      netstandard1.0_Windows;
+      netstandard1.0_Unix;
+      uap101aot_Windows;
+    </SupportedGroups>
+    <DefaultTargetGroup>netstandard1.0</DefaultTargetGroup>
+  </PropertyGroup>
   <!-- Default configurations to help VS understand the configurations -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Unix_Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Unix_Release|AnyCPU'" />

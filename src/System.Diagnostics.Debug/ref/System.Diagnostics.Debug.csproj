@@ -4,6 +4,8 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <NuGetTargetMoniker>.NETStandard,Version=v1.7</NuGetTargetMoniker>
+    <SupportedGroups>netstandard1.7_AnyOS</SupportedGroups>
+    <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Diagnostics.Debug.cs" />

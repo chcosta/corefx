@@ -4,6 +4,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <NuGetTargetMoniker>.NETStandard,Version=v1.7</NuGetTargetMoniker>
+    <SupportedTargetGroups>netstandard1.7</SupportedTargetGroups>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Microsoft.Win32.Registry.cs" />

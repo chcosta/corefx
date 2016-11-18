@@ -10,6 +10,17 @@
     <IsPartialFacadeAssembly>true</IsPartialFacadeAssembly>
     <ResourcesSourceOutputDirectory Condition="'$(TargetGroup)' != ''">None</ResourcesSourceOutputDirectory>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.7</NuGetTargetMoniker>
+    <SupportedGroups>
+      netstandard1.7_Windows;
+      netstandard1.7_Unix;
+      netcore50_AnyOS;
+      net463_Windows
+    </SupportedGroups>
+    <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
+    
+    <!-- Why isn't this getting set by default when building targeting netcoreapp1.1 -->
+    <StringResourcesPath>E:\gh\chcosta\corefx\src\System.Diagnostics.Debug\src/Resources//Strings.resx</StringResourcesPath>
+
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetsUnix)' == 'true' ">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -21,7 +32,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows_Release|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'net463_Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'net463_Release|AnyCPU'" />
-  <ItemGroup Condition="'$(TargetGroup)' == ''">
+  <ItemGroup Condition="'$(TargetGroup)' == '' or '$(TargetGroup)' == 'netcoreapp1.1'">
     <Compile Include="Properties\InternalsVisibleTo.cs" />
     <Compile Include="System\Diagnostics\Debug.Public.cs" />
     <Compile Include="System\Diagnostics\DebuggerStepperBoundaryAttribute.cs" />
@@ -30,7 +41,7 @@
       <Link>System\Diagnostics\Debug.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetsWindows)' == 'true' And '$(TargetGroup)' == ''">
+  <ItemGroup Condition=" '$(TargetsWindows)' == 'true' And ('$(TargetGroup)' == '' or '$(TargetGroup)' == 'netcoreapp1.1')">
     <Compile Include="$(CommonPath)\System\Diagnostics\Debug.Windows.cs">
       <Link>System\Diagnostics\Debug.Windows.cs</Link>
     </Compile>

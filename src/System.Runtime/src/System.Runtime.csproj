@@ -10,6 +10,15 @@
     <PackageTargetFramework Condition="'$(TargetGroup)'==''">netstandard1.7;uap10.1</PackageTargetFramework>
     <GenFacadesArgs Condition="'$(TargetGroup)' == 'uap101aot'">$(GenFacadesArgs) -ignoreMissingTypes</GenFacadesArgs>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.7</NuGetTargetMoniker>
+    <SupportedGroups>
+      netstandard1.7_AnyOS;
+      netstandard1.5_AnyOS;
+      netcore50_AnyOS;
+      net463_AnyOS;
+      net462_AnyOS;
+      uap101_Windows;
+    </SupportedGroups>
+    <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
   </PropertyGroup>
   <!-- Default configurations to help VS understand the configurations -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'" />

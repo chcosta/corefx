@@ -12,6 +12,7 @@
     <DefineConstants>$(DefineConstants);REGISTRY_ASSEMBLY</DefineConstants>
     <IsPartialFacadeAssembly Condition="'$(TargetGroup)' == 'net463'">true</IsPartialFacadeAssembly>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.7</NuGetTargetMoniker>
+    <SupportedTargetGroups>netstandard1.7;net463</SupportedTargetGroups>
   </PropertyGroup>
   <!-- Help VS understand available configurations -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows_Debug|AnyCPU'" />
