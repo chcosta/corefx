@@ -6,6 +6,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPartialFacadeAssembly Condition="'$(TargetGroup)'=='net463'">true</IsPartialFacadeAssembly>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.7</NuGetTargetMoniker>
+    <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
+    <ProjectConfigurations>
+      $(DefaultTargetGroup)|AnyOS;
+      net463|AnyOS
+    </ProjectConfigurations>
   </PropertyGroup>
   <!-- Default configurations to help VS understand the options -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard1.7_Debug|AnyCPU'" />

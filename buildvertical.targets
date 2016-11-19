@@ -172,10 +172,10 @@
     <!-- Annotate the ProjectReference -->
     <ItemGroup>
         <ProjectReference Condition="'%(ProjectReference.OutputItemType)' != 'ResolvedMatchingContract'">
-          <TargetGroup Condition="'$(_SelectedOSGroup)' != '$(_DefaultTargetGroup)'">$(_SelectedOSGroup)</TargetGroup>
-          <TargetGroup Condition="'$(_SelectedOSGroup)' == '$(_DefaultTargetGroup)'" />
+          <TargetGroup Condition="'$(_SelectedTargetGroup)' != '$(_DefaultTargetGroup)'">$(_SelectedTargetGroup)</TargetGroup>
+          <TargetGroup Condition="'$(_SelectedTargetGroup)' == '$(_DefaultTargetGroup)'" />
           <OSGroup>$(_SelectedOSGroup)</OSGroup>
-          <UndefineProperties Condition="'$(_SelectedOSGroup)' == '$(_DefaultTargetGroup)'">%(ProjectReference.UndefineProperties);TargetGroup</UndefineProperties>
+          <UndefineProperties Condition="'$(_SelectedTargetGroup)' == '$(_DefaultTargetGroup)'">%(ProjectReference.UndefineProperties);TargetGroup</UndefineProperties>
         </ProjectReference>
     </ItemGroup>
   </Target>

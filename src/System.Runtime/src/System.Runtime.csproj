@@ -13,7 +13,7 @@
     <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
     <ProjectConfigurations>
       $(DefaultTargetGroup)|AnyOS;
-      $(DefaultTargetGroup)|AnyOS;
+      netstandard1.5|AnyOS;
       netcore50|AnyOS;
       net463|AnyOS;
       net462|AnyOS;
