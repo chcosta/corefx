@@ -164,8 +164,8 @@
   <PropertyGroup Condition="'$(Configuration)'==''">
     <ConfigurationGroup Condition="'$(ConfigurationGroup)'==''">Debug</ConfigurationGroup>
     <Configuration>$(ConfigurationGroup)</Configuration>
-    <Configuration Condition="'$(TargetGroup)'!=''">$(TargetGroup)_$(Configuration)</Configuration>
-    <Configuration Condition="'$(OSGroup)'!='' and '$(OSGroup)'!='AnyOS'">$(OSGroup)_$(Configuration)</Configuration>
+    <Configuration Condition="'$(TargetGroup)'!=''">$(TargetGroup)|$(Configuration)</Configuration>
+    <Configuration Condition="'$(OSGroup)'!='' and '$(OSGroup)'!='AnyOS'">$(OSGroup)|$(Configuration)</Configuration>
   </PropertyGroup>
 
   <!--

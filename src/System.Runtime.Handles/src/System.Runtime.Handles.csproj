@@ -7,7 +7,12 @@
     <IsPartialFacadeAssembly>true</IsPartialFacadeAssembly>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.7</NuGetTargetMoniker>
     <PackageTargetFramework Condition="'$(TargetGroup)'==''">netstandard1.7;uap10.1</PackageTargetFramework>
-    <SupportedTargetGroups>netstandard1.7;net463;uap10.1</SupportedTargetGroups>
+    <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
+    <ProjectConfigurations>
+      $(DefaultTargetGroup)|AnyOS;
+      net463|AnyOS;
+      uap10.1|AnyOS
+    </ProjectConfigurations>
   </PropertyGroup>
   <!-- Default configurations to help VS understand the configurations -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'" />

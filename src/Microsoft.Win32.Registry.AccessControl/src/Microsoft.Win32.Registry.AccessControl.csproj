@@ -11,11 +11,11 @@
     <GeneratePlatformNotSupportedAssembly Condition="'$(TargetsUnix)' == 'true'">true</GeneratePlatformNotSupportedAssembly>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.3</NuGetTargetMoniker>
     <DefaultTargetGroup>netstandard1.3</DefaultTargetGroup>
-    <SupportedGroups>
-      $(DefaultTargetGroup)_Windows;
-      $(DefaultTargetGroup)_Unix;
-      net46_AnyOS
-    </SupportedGroups>
+    <ProjectConfigurations>
+      $(DefaultTargetGroup)|Windows_NT;
+      $(DefaultTargetGroup)|Unix;
+      net46|AnyOS
+    </ProjectConfigurations>
   </PropertyGroup>
   <!-- Help VS understand available configurations -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Windows_Debug|AnyCPU'" />

@@ -5,7 +5,7 @@
     <OutputType>Library</OutputType>
     <NuGetTargetMoniker>.NETStandard,Version=v1.3</NuGetTargetMoniker>
     <DefaultTargetGroup>netstandard1.3</DefaultTargetGroup>
-    <SupportedGroups>$(DefaultTargetGroup)_AnyOS</SupportedGroups>
+    <ProjectConfigurations>$(DefaultTargetGroup)|AnyOS</ProjectConfigurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Microsoft.Win32.Registry.AccessControl.cs" />

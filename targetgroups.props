@@ -19,37 +19,37 @@
     <TargetGroups Include="netstandard1.1">
         <PackageTargetFramework>netstandard1.1</PackageTargetFramework>
         <NuGetTargetMoniker>.NETStandard,Version=v1.1</NuGetTargetMoniker>
-        <FallbackGroup>netstandard1.0</FallbackGroup>
+        <Imports>netstandard1.0</Imports>
     </TargetGroups>
     <TargetGroups Include="netstandard1.2">
         <PackageTargetFramework>netstandard1.2</PackageTargetFramework>
         <NuGetTargetMoniker>.NETStandard,Version=v1.2</NuGetTargetMoniker>
-        <FallbackGroup>netstandard1.1</FallbackGroup>
+        <Imports>netstandard1.1</Imports>
     </TargetGroups>
     <TargetGroups Include="netstandard1.3">
         <PackageTargetFramework>netstandard1.3</PackageTargetFramework>
         <NuGetTargetMoniker>.NETStandard,Version=v1.3</NuGetTargetMoniker>
-        <FallbackGroup>netstandard1.2</FallbackGroup>
+        <Imports>netstandard1.2</Imports>
     </TargetGroups>
     <TargetGroups Include="netstandard1.4">
         <PackageTargetFramework>netstandard1.4</PackageTargetFramework>
         <NuGetTargetMoniker>.NETStandard,Version=v1.4</NuGetTargetMoniker>
-        <FallbackGroup>netstandard1.3</FallbackGroup>
+        <Imports>netstandard1.3</Imports>
     </TargetGroups>
     <TargetGroups Include="netstandard1.5">
         <PackageTargetFramework>netstandard1.5</PackageTargetFramework>
         <NuGetTargetMoniker>.NETStandard,Version=v1.5</NuGetTargetMoniker>
-        <FallbackGroup>netstandard1.4</FallbackGroup>
+        <Imports>netstandard1.4</Imports>
     </TargetGroups>
     <TargetGroups Include="netstandard1.6">
         <PackageTargetFramework>netstandard1.6</PackageTargetFramework>
         <NuGetTargetMoniker>.NETStandard,Version=v1.6</NuGetTargetMoniker>
-        <FallbackGroup>netstandard1.5</FallbackGroup>
+        <Imports>netstandard1.5</Imports>
     </TargetGroups>
     <TargetGroups Include="netstandard1.7">
         <PackageTargetFramework>netstandard1.7</PackageTargetFramework>
         <NuGetTargetMoniker>.NETStandard,Version=v1.7</NuGetTargetMoniker>
-        <FallbackGroup>netstandard1.6</FallbackGroup>
+        <Imports>netstandard1.6</Imports>
     </TargetGroups>
     <TargetGroups Include="netstandard13aot">
         <PackageTargetFramework>netstandard1.3</PackageTargetFramework>
@@ -69,7 +69,7 @@
     <TargetGroups Include="netcoreapp1.1">
         <PackageTargetFramework>netcoreapp1.1</PackageTargetFramework>
         <NuGetTargetMoniker>.NETCoreApp,Version=v1.1</NuGetTargetMoniker>
-        <FallbackGroup>netcoreapp1.0</FallbackGroup>
+        <Imports>netcoreapp1.0</Imports>
         <CompatibleGroup>netstandard1.7</CompatibleGroup>
     </TargetGroups>
     <TargetGroups Include="dnxcore50">
@@ -79,35 +79,35 @@
         <PackageTargetFramework>net463</PackageTargetFramework>
         <TargetingPackNugetPackageId>Microsoft.TargetingPack.NETFramework.v4.6.3</TargetingPackNugetPackageId>
         <NuGetTargetMoniker>.NETFramework,Version=v4.6.3</NuGetTargetMoniker>
-        <FallbackGroup>net462</FallbackGroup>
+        <Imports>net462</Imports>
         <CompatibleGroup>netstandard1.7</CompatibleGroup>
     </TargetGroups>
     <TargetGroups Include="net462">
         <PackageTargetFramework>net462</PackageTargetFramework>
         <TargetingPackNugetPackageId>Microsoft.TargetingPack.NETFramework.v4.6.2</TargetingPackNugetPackageId>
         <NuGetTargetMoniker>.NETFramework,Version=v4.6.2</NuGetTargetMoniker>
-        <FallbackGroup>net461</FallbackGroup>
+        <Imports>net461</Imports>
         <CompatibleGroup>netstandard1.5</CompatibleGroup>
     </TargetGroups>
     <TargetGroups Include="net461">
         <PackageTargetFramework>net461</PackageTargetFramework>
         <TargetingPackNugetPackageId>Microsoft.TargetingPack.NETFramework.v4.6.1</TargetingPackNugetPackageId>
         <NuGetTargetMoniker>.NETFramework,Version=v4.6.1</NuGetTargetMoniker>
-        <FallbackGroup>net46</FallbackGroup>
+        <Imports>net46</Imports>
         <CompatibleGroup>netstandard1.4</CompatibleGroup>
     </TargetGroups>
     <TargetGroups Include="net46">
         <PackageTargetFramework>net46</PackageTargetFramework>
         <TargetingPackNugetPackageId>Microsoft.TargetingPack.NETFramework.v4.6</TargetingPackNugetPackageId>
         <NuGetTargetMoniker>.NETFramework,Version=v4.6</NuGetTargetMoniker>
-        <FallbackGroup>net451</FallbackGroup>
+        <Imports>net451</Imports>
         <CompatibleGroup>netstandard1.3</CompatibleGroup>
     </TargetGroups>
     <TargetGroups Include="net451">
         <PackageTargetFramework>net451</PackageTargetFramework>
         <TargetingPackNugetPackageId>Microsoft.TargetingPack.NETFramework.v4.5.1</TargetingPackNugetPackageId>
         <NuGetTargetMoniker>.NETFramework,Version=v4.5.1</NuGetTargetMoniker>
-        <FallbackGroup>net45</FallbackGroup>
+        <Imports>net45</Imports>
         <CompatibleGroup>netstandard1.2</CompatibleGroup>
     </TargetGroups>
     <TargetGroups Include="net45">

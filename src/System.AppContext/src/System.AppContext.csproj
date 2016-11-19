@@ -12,10 +12,10 @@
     <ExcludeResourcesImport Condition="'$(IsPartialFacadeAssembly)'=='true'">true</ExcludeResourcesImport>
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.7</NuGetTargetMoniker>
     <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
-    <SupportedGroups>
-      $(DefaultTargetGroup)_AnyOS;
+    <ProjectConfigurations>
+      $(DefaultTargetGroup)|AnyOS;
       net463_AnyOS
-    </SupportedGroups>
+    </ProjectConfigurations>
   </PropertyGroup>
   <!-- Default configurations to help VS understand the options -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'" />
