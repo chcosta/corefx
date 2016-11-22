@@ -143,7 +143,9 @@
     </TargetGroups>
   </ItemGroup>
 
-<!-- ToDo: get rid of this -->
+<!-- ToDo: get rid of this
+     We fail when this isn't present when doing regular builds because we don't set the NuGetTargetMoniker which
+     means we don't resolve references... -->
   <!-- Setup properties per TargetGroup -->
   <Choose>
 
@@ -151,7 +153,8 @@
       <PropertyGroup>
       </PropertyGroup>
     </When>
-<!-->    
+
+
     <When Condition="'$(TargetGroup)'=='netcore50'">
       <PropertyGroup>
         <PackageTargetFramework>netcore50</PackageTargetFramework>
@@ -313,7 +316,8 @@
         <NuGetTargetMoniker>UAP,Version=v10.1</NuGetTargetMoniker>
       </PropertyGroup>
     </When>
--->    
+
+
     <When Condition="'$(TargetGroup)'=='portable-net45+win8+sl5'">
       <PropertyGroup>
         <PackageTargetFramework>portable-net45+win8+sl5</PackageTargetFramework>
@@ -336,18 +340,16 @@
         </Compile>
       </ItemGroup>
     </When>
-<!-->    
     <Otherwise>
       <PropertyGroup>
         <ConfigurationErrorMsg>$(ConfigurationErrorMsg);Unknown TargetGroup [$(TargetGroup)] specificed in your project.</ConfigurationErrorMsg>
       </PropertyGroup>
     </Otherwise>
--->    
   </Choose>
 
   <Target Name="SetTargetGroupProperties"
           BeforeTargets="BeforeResolveReferences"
-          Condition="'$(TargetGroup)' != ''">
+          Condition="'$(TargetGroup)' != '' and '$(_BuildVertical)' == 'true'">
     <PropertyGroup>
       <PackageTargetFramework Condition="'%(TargetGroups.Identity)' == '$(TargetGroup)' and '%(TargetGroups.PackageTargetFramework)' != ''">%(TargetGroups.PackageTargetFramework)</PackageTargetFramework>
       <PackageTargetRuntime Condition="'%(TargetGroups.Identity)' == '$(TargetGroup)' and '%(TargetGroups.PackageTargetRuntime)' != ''">%(TargetGroups.PackageTargetRuntime)</PackageTargetRuntime>
