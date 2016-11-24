@@ -6,10 +6,6 @@
     <NuGetTargetMoniker>.NETStandard,Version=v1.7</NuGetTargetMoniker>
     <!-- copy to uap10.1 until nuget makes the change to map that to ns1.7 -->
     <PackageTargetFramework Condition="'$(TargetGroup)' == ''">netstandard1.7;uap10.1</PackageTargetFramework>
-    <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
-    <ProjectConfigurations>
-      $(DefaultTargetGroup)|AnyOS
-    </ProjectConfigurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Microsoft.Win32.Primitives.cs" />

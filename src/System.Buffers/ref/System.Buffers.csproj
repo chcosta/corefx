@@ -6,8 +6,6 @@
     <NuGetTargetMoniker>.NETStandard,Version=v1.1</NuGetTargetMoniker>
     <ProjectGuid>{11AE73F7-3532-47B9-8FF6-B4F22D76456C}</ProjectGuid>
     <UseOpenKey Condition="'$(UseOpenKey)'==''">true</UseOpenKey>
-    <DefaultTargetGroup>netstandard1.1</DefaultTargetGroup>
-    <ProjectConfigurations>$(DefaultTargetGroup)|AnyOS</ProjectConfigurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Buffers.cs" />

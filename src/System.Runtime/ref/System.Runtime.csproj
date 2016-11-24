@@ -9,11 +9,6 @@
     <PackageTargetFramework Condition="'$(TargetGroup)'=='netstandard1.7'">netstandard1.7;uap10.1</PackageTargetFramework>
     <ProjectGuid>{ADBCF120-3454-4A3C-9D1D-AC4293E795D6}</ProjectGuid>
     <DefineConstants Condition="'$(TargetGroup)' == ''">$(DefineConstants);netcoreapp11</DefineConstants>
-    <DefaultTargetGroup>netcoreapp1.1</DefaultTargetGroup>
-    <ProjectConfigurations>
-      $(DefaultTargetGroup)|AnyOS;
-      netstandard1.7|AnyOS
-    </ProjectConfigurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Runtime.cs" />

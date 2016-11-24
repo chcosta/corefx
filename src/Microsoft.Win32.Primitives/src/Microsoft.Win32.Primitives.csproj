@@ -13,12 +13,6 @@
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETStandard,Version=v1.7</NuGetTargetMoniker>
     <!-- copy to uap10.1 until nuget makes the change to map that to ns1.7 -->
     <PackageTargetFramework Condition="'$(TargetGroup)' == ''">netstandard1.7;uap10.1</PackageTargetFramework>
-    <DefaultTargetGroup>netstandard1.7</DefaultTargetGroup>
-    <ProjectConfigurations>
-      $(DefaultTargetGroup)|Unix;
-      $(DefaultTargetGroup)|Windows_NT;
-      net463|AnyOS
-    </ProjectConfigurations>
   </PropertyGroup>
   <!-- Help VS understand available configurations -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Unix_Debug|AnyCPU'" />

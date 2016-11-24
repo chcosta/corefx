@@ -7,11 +7,6 @@
     <NuGetTargetMoniker Condition="'$(TargetGroup)' == ''">.NETCoreApp,Version=v1.1</NuGetTargetMoniker>
     <DefineConstants Condition="'$(TargetGroup)' == ''">$(DefineConstants);netcoreapp11</DefineConstants>
     <PackageTargetFramework Condition="'$(TargetGroup)' == 'netstandard1.7'">netstandard1.7;uap10.1</PackageTargetFramework>
-    <DefaultTargetGroup>netcoreapp1.1</DefaultTargetGroup>
-    <ProjectConfigurations>
-      $(DefaultTargetGroup)|AnyOS;
-      netstandard1.7|AnyOS
-    </ProjectConfigurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Collections.cs" />
