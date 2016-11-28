@@ -278,6 +278,9 @@
     },
     "VsoCorefxGitUrl": {
       "value": "https://$(VsoAccountName):$(VsoPassword)@devdiv.visualstudio.com/DevDiv/_git/$(VsoRepositoryName)/"
+    },
+    "Build.Clean": {
+      "value": "all"
     }
   },
   "demands": [
@@ -306,7 +309,9 @@
       "labelSources": "0",
       "reportBuildStatus": "true",
       "fetchDepth": "0",
-      "gitLfsSupport": "false"
+      "gitLfsSupport": "false",
+      "skipSyncSource": "false",
+      "cleanOptions": "0"
     },
     "id": "0a2b2664-c1be-429c-9b40-8a24dee27a4a",
     "type": "TfsGit",
@@ -336,6 +341,6 @@
     "description": "Visual Studio and DevDiv team project for git source code repositories.  Work items will be added for Adams, Dev14 work items are tracked in vstfdevdiv.  ",
     "url": "https://devdiv.visualstudio.com/DefaultCollection/_apis/projects/0bdbc590-a062-4c3f-b0f6-9383f67865ee",
     "state": "wellFormed",
-    "revision": 418097399
+    "revision": 418097423
   }
 }
