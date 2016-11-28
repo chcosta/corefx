@@ -10,8 +10,9 @@
   <Target Name="GatherProjectsForVerticalBuild"
           BeforeTargets="DetermineBuildVerticalProjects">
     <ItemGroup>
-      <!-- <ReferenceProject Include="$(ProjectDir)**/ref/*.csproj" /> -->
+      <ReferenceProject Include="$(ProjectDir)**/ref/*.csproj" />
       <SourceProject Include="$(ProjectDir)**/src/*.csproj" />
+      <VerticalProject Include="@(ReferenceProject)" />
       <VerticalProject Include="@(SourceProject)" />
     </ItemGroup>
     <Message Text="Projects: @(VerticalProject)" Importance="Low" />
@@ -62,7 +63,7 @@
       <_SelectedTargetGroup>%(VerticalTargets.TargetGroup)</_SelectedTargetGroup>
     </PropertyGroup>
 
-<Message Importance="Low" Text="Adding '$(_VerticalProject)', DefaultTargetGroup: $(_DefaultTargetGroup), SelectedTargetGroup: $(_SelectedTargetGroup), SelectedOSGroup: $(_SelectedOSGroup)" />
+    <Message Importance="Low" Text="Adding '$(_VerticalProject)', DefaultTargetGroup: $(_DefaultTargetGroup), SelectedTargetGroup: $(_SelectedTargetGroup), SelectedOSGroup: $(_SelectedOSGroup)" />
     <ItemGroup>
       <VerticalProjects Remove="$(_VerticalProject)" />
       <VerticalProjects Condition="'$(_DefaultTargetGroup)' != '$(_SelectedTargetGroup)' and '$(_SelectedTargetGroup)' != '' and '$(_SelectedOSGroup)' != ''" Include="$(_VerticalProject)" >
@@ -165,7 +166,7 @@
                      OSGroups="@(OSGroups)"
                      TargetGroups="@(TargetGroups)"
                      ProjectConfigurations="$(ProjectConfigurations)"
-                     UseCompileFramework="true"
+                     UseCompileFramework="false"
                      AllowCompatibleFramework="true"
                      Condition="'$(ProjectConfigurations)' != ''">
       <Output TaskParameter="OutputItem" ItemName="VerticalTargets" />                          
@@ -209,7 +210,6 @@
 
   <!-- Evaluate each project with TargetGroup == '', then read the derived NuGetTargetMoniker and determine TargetGroup -->
   <Target Name="GetDefaultTargetGroup"
-          AfterTargets="GatherProjectsForVerticalBuild"
           Inputs="$(MSBuildProjectFullPath)"
           Outputs="fake"
           Returns="$(_DefaultTargetGroup)">
