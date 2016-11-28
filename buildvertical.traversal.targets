@@ -5,6 +5,7 @@
     <PropertyGroup>
       <DefaultBuildAllTarget Condition="'$(DefaultBuildAllTarget)'==''">$(MSBuildProjectDefaultTargets)</DefaultBuildAllTarget>
     </PropertyGroup>
+
     <Message Importance="Low" Text="Building: %(Project.Identity) for %(Project.TargetGroup), %(Project.OSGroup)" />
     <MSBuild Targets="$(DefaultBuildAllTarget)"
              Projects="@(Project)"

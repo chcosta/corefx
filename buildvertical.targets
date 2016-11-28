@@ -14,6 +14,7 @@
       <SourceProject Include="$(ProjectDir)**/src/*.csproj" />
       <VerticalProject Include="@(SourceProject)" />
     </ItemGroup>
+    <Message Text="Projects: @(VerticalProject)" Importance="Low" />
   </Target>
 
   <!-- Add vertical projects to the project group for BuildAllProjects -->
@@ -61,6 +62,7 @@
       <_SelectedTargetGroup>%(VerticalTargets.TargetGroup)</_SelectedTargetGroup>
     </PropertyGroup>
 
+<Message Importance="Low" Text="Adding '$(_VerticalProject)', DefaultTargetGroup: $(_DefaultTargetGroup), SelectedTargetGroup: $(_SelectedTargetGroup), SelectedOSGroup: $(_SelectedOSGroup)" />
     <ItemGroup>
       <VerticalProjects Remove="$(_VerticalProject)" />
       <VerticalProjects Condition="'$(_DefaultTargetGroup)' != '$(_SelectedTargetGroup)' and '$(_SelectedTargetGroup)' != '' and '$(_SelectedOSGroup)' != ''" Include="$(_VerticalProject)" >
@@ -72,6 +74,9 @@
         <AdditionalProperties>OSGroup=$(_SelectedOSGroup)</AdditionalProperties>
         <OSGroup>$(_SelectedOSGroup)</OSGroup>
         <UndefineProperties>TargetGroup</UndefineProperties>
+      </VerticalProjects>
+      <VerticalProjects Condition="'$(_DefaultTargetGroup)' == '$(_SelectedTargetGroup)' and '$(_SelectedOSGroup)' != '' and '$(_SelectedOSGroup)' == 'AnyOS'" Include="$(_VerticalProject)">
+        <UndefineProperties>TargetGroup;OSGroup</UndefineProperties>
       </VerticalProjects>
       <VerticalProjects Condition="'$(_DefaultTargetGroup)' == ''" Include="$(_VerticalProject)">
         <OmitReason>No DefaultTargetGroup defined</OmitReason>
