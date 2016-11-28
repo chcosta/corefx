@@ -176,13 +176,14 @@
       <_SelectedOSGroup>%(VerticalTargets.OSGroup)</_SelectedOSGroup>
     </PropertyGroup>
     <Message Importance="Low" Text="Annotate ProjectReference - $(MSBuildProjectFullPath) - $(_ProjectReferenceToAnnotate) ($(_SelectedTargetGroup) === $(_DefaultTargetGroup),  $(_SelectedOSGroup)) Supports: $(ProjectConfigurations)" />
+
+    <Error ContinueOnError="true" Condition="$(_ProjectReferenceToAnnotate.EndsWith('.builds')) or $(_ProjectReferenceToAnnotate.EndsWith('.pkgproj'))" Text="Warning: $(MSBuildProjectFullPath) contains ProjectReference to a multi-build project, '$(_ProjectReferenceToAnnotate)'" />
     <!-- Annotate the ProjectReference -->
     <ItemGroup>
         <ProjectReference Condition="'%(ProjectReference.OutputItemType)' != 'ResolvedMatchingContract'">
-          <TargetGroup Condition="'$(_SelectedTargetGroup)' != '$(_DefaultTargetGroup)'">$(_SelectedTargetGroup)</TargetGroup>
-          <TargetGroup Condition="'$(_SelectedTargetGroup)' == '$(_DefaultTargetGroup)'" />
-          <OSGroup Condition="'$(_SelectedOSGroup)' != 'AnyOS'">$(_SelectedOSGroup)</OSGroup>
-          <UndefineProperties Condition="'$(_SelectedTargetGroup)' == '$(_DefaultTargetGroup)'">%(ProjectReference.UndefineProperties);TargetGroup</UndefineProperties>
+          <TargetGroup Condition="'$(_SelectedTargetGroup)' != '$(_DefaultTargetGroup)' and '%(ProjectReference.TargetGroup)' == ''">$(_SelectedTargetGroup)</TargetGroup>
+          <OSGroup Condition="'$(_SelectedOSGroup)' != 'AnyOS' and '%(ProjectReference.OSGroup)' == ''">$(_SelectedOSGroup)</OSGroup>
+          <UndefineProperties Condition="'$(_SelectedTargetGroup)' == '$(_DefaultTargetGroup)' and '%(ProjectReference.TargetGroup)' == ''">%(ProjectReference.UndefineProperties);TargetGroup</UndefineProperties>
         </ProjectReference>
     </ItemGroup>
   </Target>

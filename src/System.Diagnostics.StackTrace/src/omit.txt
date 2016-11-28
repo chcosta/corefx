@@ -1,1 +1,1 @@
-Adds reference to System.Runtme.Extensions which doesn't build yet.
+The added reference to System.Runtime.Extensions which doesn't build properly (missing Aliases?).
