@@ -1,41 +1,126 @@
-@Library('dotnet-ci') _
+@Library(['dotnet-ci']) _
 
-// Incoming parameters.  Access with "params.<param name>".
-// Note that the parameters will be set as env variables so we cannot use names that conflict
-// with the engineering system parameter names.
-// CGroup - Build configuration.
-// TestOuter - If true, runs outerloop, if false runs just innerloop
+build(params, env)
 
-def submittedHelixJson = null
+def build(params, env)
+{
+    library "buildtools@${params.BuildToolsSharedLibraryBranchOrCommit}"
 
-simpleNode('OSX10.12','latest') {
-    stage ('Checkout source') {
-        checkoutRepo()
+    def helixEndpointCredential = 'helixStagingEndpointWithEntity'
+    def sender
+    def workItemId
+    officialBuildStep {
+        sender = createSenderMap(helixEndpointCredential)
+        sendEvent('WorkItemQueued', 
+                    [WorkItemFriendlyName: "Orchestration"],
+                    sender)
     }
+    try {
+        // Incoming parameters.  Access with "params.<param name>".
+        // Note that the parameters will be set as env variables so we cannot use names that conflict
+        // with the engineering system parameter names.
+        // CGroup - Build configuration.
+        // TestOuter - If true, runs outerloop, if false runs just innerloop
 
-    def logFolder = getLogFolder()
+        def submittedHelixJson = null
 
-    stage ('Initialize tools') {
-        // Workaround nuget issue https://github.com/NuGet/Home/issues/5085 were we need to set HOME
-        // Init tools
-        sh 'HOME=\$WORKSPACE/tempHome ./init-tools.sh'
-    }
-    stage ('Generate version assets') {
-        // Generate the version assets.  Do we need to even do this for non-official builds?
-        sh "./build-managed.sh -- /t:GenerateVersionSourceFile /p:GenerateVersionSourceFile=true"
-    }
-    stage ('Sync') {
-        sh "HOME=\$WORKSPACE/tempHome ./sync.sh -p -- /p:ArchGroup=x64"
-    }
-    stage ('Build Product') {
-        sh "HOME=\$WORKSPACE/tempHome ./build.sh -buildArch=x64 -${params.CGroup}"
-    }
-    stage ('Build Tests') {
-        def additionalArgs = ''
-        if (params.TestOuter) {
-            additionalArgs = '-Outerloop'
+
+        simpleNode('OSX10.12','latest') {
+            stage ('Checkout source') {
+                checkoutRepo()
+            }
+            officialBuildStep {
+                sendEvent('JobStarted', 
+                            [Creator: env.USERNAME, 
+                            QueueId: "Build", 
+                            Source: "official/corefx/jenkins/${getBranch()}/", 
+                            JobType: "build/product/", 
+                            Build: params.OfficialBuildId.replace('-', '.'),
+                            Properties: [OperatingSystem: "OSX",
+                                        Platform: params.AGroup,
+                                        ConfigurationGroup: params.CGroup,
+                                        SubType: params.TGroup]],
+                            sender)
+                sendEvent('WorkItemStarted', 
+                            [WorkItemFriendlyName: "Orchestration"],
+                            sender)
+                sendEvent('VsoBuildInformation', 
+                            [BuildNumber: params.OfficialBuildId.replace('-', '.'), Uri: env.BUILD_URL, LogUri: env.BUILD_URL],
+                            sender)
+                sendEvent('ExternalLink', 
+                            [Description: "Jenkins Information", Uri: env.BUILD_URL],
+                            sender)
+                sendEvent('ChildJobCreated', 
+                            [ChildId: sender.correlationId],
+                            createSenderMap(sender.credentialsIdentifier, params.CorrelationId))
+            }
+
+            def logFolder = getLogFolder()
+
+            stage ('Initialize tools') {
+                // Workaround nuget issue https://github.com/NuGet/Home/issues/5085 were we need to set HOME
+                // Init tools
+                sh 'HOME=\$WORKSPACE/tempHome ./init-tools.sh'
+            }
+            stage ('Generate version assets') {
+                def buildArgs = ''
+                officialBuildStep {
+                    buildArgs += "-OfficialBuildId=${params.OfficialBuildId}"
+                }
+                buildArgs += " -- /t:GenerateVersionSourceFile /p:GenerateVersionSourceFile=true"
+                    
+                // Generate the version assets.  Do we need to even do this for non-official builds?
+                sh "./build-managed.sh ${buildArgs}"
+            }
+            stage ('Sync') {
+                sh "HOME=\$WORKSPACE/tempHome ./sync.sh -p -- /p:ArchGroup=x64"
+            }
+            stage ('Build Product') {
+                def buildArgs = "-buildArch=x64 -${params.CGroup}"
+                officialBuildStep {
+                    buildArgs += " -OfficialBuildId=${params.OfficialBuildId}"
+                }
+
+                sh "HOME=\$WORKSPACE/tempHome ./build.sh ${buildArgs}"
+            }
+            stage ('Build Tests') {
+                def additionalArgs = ''
+                if (params.TestOuter) {
+                    additionalArgs += '-Outerloop'
+                }
+                officialBuildStep {
+                    additionalArgs += ' -SkipTests'
+                }
+                
+                sh "HOME=\$WORKSPACE/tempHome ./build-tests.sh -buildArch=x64 -${params.CGroup} -SkipTests ${additionalArgs} -- /p:ArchiveTests=true /p:EnableDumpling=true"
+            }
+            officialBuildStep {
+                stage('Push packages to Azure') {
+                    withCredentials([string(credentialsId: 'CloudDropAccessToken', variable: 'CloudDropAccessToken')]) {
+                        def containerName = getOfficialBuildAzureContainerName('corefx', params.OfficialBuildId)
+                        sh "HOME=\$WORKSPACE/tempHome ./publish-packages.sh -AzureAccount=dotnetbuilddrops -AzureToken=\$CloudDropAccessToken -Container=${containerName} -- /p:OverwriteOnPublish=false"
+                    }
+                }
+            }            
         }
-        sh "HOME=\$WORKSPACE/tempHome ./build-tests.sh -buildArch=x64 -${params.CGroup} -SkipTests ${additionalArgs} -- /p:ArchiveTests=true /p:EnableDumpling=true"
+        officialBuildStep {
+            sendEvent('WorkItemFinished',
+                      [ExitCode: '0'],
+                      sender)
+        }
+    }
+    catch(Exception e) {
+        officialBuildStep {
+            sendEvent('VsoBuildWarningsAndErrors',
+                      [WarningCount: '0', ErrorCount: '1'],
+                      sender)
+        }
+        officialBuildStep {
+            sendEvent('WorkItemFinished',
+                      [ExitCode: '1'],
+                      sender)
+        }
+        throw e
     }
     stage ('Submit To Helix For Testing') {
         // Bind the credentials
